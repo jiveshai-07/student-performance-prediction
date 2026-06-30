@@ -1,0 +1,87 @@
+/* ===========================
+   GitHub Dark Theme
+=========================== */
+
+.main {
+    background-color: #0d1117;
+}
+
+/* Sidebar */
+
+section[data-testid="stSidebar"] {
+    background-color: #161b22;
+}
+
+/* Titles */
+
+h1, h2, h3 {
+    color: #f0f6fc;
+}
+
+/* Paragraph */
+
+p {
+    color: #c9d1d9;
+}
+
+/* Metric Cards */
+
+div[data-testid="metric-container"] {
+
+    background-color: #161b22;
+
+    border: 1px solid #30363d;
+
+    padding: 18px;
+
+    border-radius: 15px;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+
+}
+
+/* Buttons */
+
+.stButton>button {
+
+    width:100%;
+
+    border-radius:12px;
+
+    height:55px;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    background:#238636;
+
+    color:white;
+
+    border:none;
+
+}
+
+.stButton>button:hover{
+
+    background:#2ea043;
+
+}
+
+/* DataFrames */
+
+div[data-testid="stDataFrame"]{
+
+    border-radius:15px;
+
+    overflow:hidden;
+
+}
+
+/* Success Boxes */
+
+div[data-testid="stAlert"]{
+
+    border-radius:15px;
+
+}
