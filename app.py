@@ -40,33 +40,36 @@ page = st.sidebar.radio(
 # -------------------------------
 if page == "🏠 Home":
 
+    # Load dataset
+    df = pd.read_csv("data/StudentPerformanceFactors.csv")
+
+    # Hero Banner
     st.markdown("""
-<div style='
-background: linear-gradient(90deg,#0d1117,#161b22);
-padding:30px;
-border-radius:15px;
-border:1px solid #30363d;
-text-align:center;
-margin-bottom:20px;'>
+    <div style="
+        background: linear-gradient(90deg, #0d1117, #161b22);
+        padding:30px;
+        border-radius:15px;
+        border:1px solid #30363d;
+        text-align:center;
+        margin-bottom:20px;
+    ">
+        <h1 style="color:#58a6ff;">
+            🎓 Student Performance Prediction
+        </h1>
 
-<h1 style='color:#58a6ff;margin-bottom:10px;'>
-🎓 Student Performance Prediction
-</h1>
+        <h3 style="color:white;">
+            Predict Student Exam Scores using Artificial Intelligence & Machine Learning
+        </h3>
 
-<h4 style='color:white;'>
-Predict Student Exam Scores using Artificial Intelligence & Machine Learning
-</h4>
+        <p style="color:#c9d1d9;font-size:18px;">
+            Built with Python • Scikit-Learn • Streamlit
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
-<p style='color:#c9d1d9;font-size:18px;'>
-Built with Python • Scikit-Learn • Streamlit
-</p>
+    st.markdown("---")
 
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown("---")
-df = pd.read_csv("data/StudentPerformanceFactors.csv")
-
+    # Metrics
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
@@ -83,27 +86,29 @@ df = pd.read_csv("data/StudentPerformanceFactors.csv")
 
     st.markdown("---")
 
+    # Project Overview
     st.header("📌 Project Overview")
 
     st.write("""
 This project predicts a student's exam score using Machine Learning.
 
-The model analyzes various academic and personal factors to estimate the expected exam score.
+The model analyzes academic and personal factors to estimate a student's expected exam score.
 
 The project demonstrates the complete Machine Learning workflow:
 
 - Data Collection
 - Data Preprocessing
 - Exploratory Data Analysis (EDA)
-- Feature Engineering
 - Machine Learning Pipeline
+- Model Training
 - Model Evaluation
-- Web App Development
-- Deployment using Streamlit
+- Streamlit Web Application
+- Deployment
 """)
 
     st.markdown("---")
 
+    # Technologies
     st.header("🛠 Technologies Used")
 
     tech1, tech2, tech3 = st.columns(3)
