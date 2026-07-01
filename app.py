@@ -3,6 +3,7 @@ import pandas as pd
 import joblib
 import plotly.express as px
 import plotly.graph_objects as go
+import base64
 from pathlib import Path
 
 # -----------------------------
@@ -522,26 +523,20 @@ elif page == "📈 Visualizations":
     )
 # ==========================
 # ABOUT PAGE
-# ==========================
+# ========================
 elif page == "👨‍💻 About":
     st.markdown("<h1>👨‍💻 About the Developer</h1>", unsafe_allow_html=True)
 
     left, right = st.columns([1, 2])
 
     with left:
-        st.markdown("""
-    <style>
-    .circular-img img {
-        border-radius: 50% !important;
-        width: 200px !important;
-        height: 200px !important;
-        object-fit: cover !important;
-    }
-    </style>
-    <div class="circular-img">
-""", unsafe_allow_html=True)
-        st.image("images/profile.jpg", width=200)
-        st.markdown("</div>", unsafe_allow_html=True)
+        with open("images/profile.jpg", "rb") as f:
+            data = base64.b64encode(f.read()).decode()
+        st.markdown(f"""
+            <img src="data:image/jpeg;base64,{data}" 
+            style="border-radius: 50%; width: 200px; height: 200px; 
+            object-fit: cover; display: block; margin: auto;">
+        """, unsafe_allow_html=True)
 
     with right:
         st.markdown("## **Jivesh Mishra**")
@@ -588,13 +583,9 @@ learning modern AI technologies.
     st.subheader("Connect with Me")
 
     st.markdown("""
-**GitHub**
+**GitHub:** [github.com/jiveshai-07](https://github.com/jiveshai-07)
 
-https://github.com/jiveshai-07
-
-**LinkedIn**
-
-https://linkedin.com/in/jivesh-mishra
+**LinkedIn:** [linkedin.com/in/jivesh-mishra](https://linkedin.com/in/jivesh-mishra)
 """)
 
     st.success("⭐ Thank you for visiting my project!")
