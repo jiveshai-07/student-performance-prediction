@@ -585,7 +585,7 @@ learning modern AI technologies.
     st.markdown("""
 **GitHub:** [github.com/jiveshai-07](https://github.com/jiveshai-07)
 
-**LinkedIn:** [linkedin.com/in/jivesh-mishra](https://linkedin.com/in/jivesh-mishra)
+**LinkedIn:** [linkedin.com/in/jivesh-mishra](https://www.linkedin.com/in/jivesh-mishra-01433331b)
 """)
 
     st.success("⭐ Thank you for visiting my project!")
