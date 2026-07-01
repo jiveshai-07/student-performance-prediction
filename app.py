@@ -529,7 +529,19 @@ elif page == "👨‍💻 About":
     left, right = st.columns([1, 2])
 
     with left:
-        st.image("images/profile.jpg", use_container_width=True)
+        st.markdown("""
+    <style>
+    .circular-img img {
+        border-radius: 50% !important;
+        width: 200px !important;
+        height: 200px !important;
+        object-fit: cover !important;
+    }
+    </style>
+    <div class="circular-img">
+""", unsafe_allow_html=True)
+st.image("images/profile.jpg", width=200)
+st.markdown("</div>", unsafe_allow_html=True)
 
     with right:
         st.markdown("## **Jivesh Mishra**")
