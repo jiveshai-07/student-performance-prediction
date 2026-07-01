@@ -1,578 +1,588 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import plotly.express as px
+import plotly.graph_objects as go
+from pathlib import Path
 
-# Load custom CSS
-def load_css():
-    with open("styles/style.css") as f:
-        st.markdown(
-            f"<style>{f.read()}</style>",
-            unsafe_allow_html=True
-        )
-
-load_css()
-
-# Page Configuration
+# -----------------------------
+# PAGE CONFIG
+# -----------------------------
 st.set_page_config(
     page_title="Student Performance Prediction",
     page_icon="🎓",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# -------------------------------
-# Sidebar
-# -------------------------------
+# -----------------------------
+# LOAD MODEL & DATA
+# -----------------------------
+@st.cache_resource
+def load_model():
+    return joblib.load("models/student_model.pkl")
+
+@st.cache_data
+def load_data():
+    return pd.read_csv("data/StudentPerformanceFactors.csv")
+
+model = load_model()
+df = load_data()
+
+# -----------------------------
+# CUSTOM CSS
+# -----------------------------
+st.markdown("""
+<style>
+
+#MainMenu{visibility:hidden;}
+footer{visibility:hidden;}
+header{visibility:hidden;}
+
+.stApp{
+background:#0f172a;
+color:white;
+}
+
+section[data-testid="stSidebar"]{
+background:#111827;
+}
+
+.block-container{
+padding-top:1.2rem;
+padding-bottom:2rem;
+padding-left:2rem;
+padding-right:2rem;
+}
+
+.hero{
+background:linear-gradient(135deg,#2563eb,#1e3a8a);
+padding:35px;
+border-radius:18px;
+text-align:center;
+margin-bottom:25px;
+box-shadow:0px 8px 20px rgba(0,0,0,.35);
+}
+
+.hero h1{
+color:white;
+font-size:42px;
+font-weight:700;
+margin-bottom:10px;
+}
+
+.hero p{
+color:#e5e7eb;
+font-size:18px;
+}
+
+.metric-card{
+background:#1e293b;
+padding:22px;
+border-radius:15px;
+text-align:center;
+box-shadow:0px 5px 15px rgba(0,0,0,.25);
+transition:0.3s;
+}
+
+.metric-card:hover{
+transform:translateY(-4px);
+}
+
+.metric-title{
+font-size:15px;
+color:#cbd5e1;
+}
+
+.metric-value{
+font-size:34px;
+font-weight:bold;
+color:#38bdf8;
+}
+
+.result-card{
+padding:25px;
+border-radius:18px;
+font-size:28px;
+font-weight:bold;
+text-align:center;
+color:white;
+margin-top:20px;
+box-shadow:0px 6px 20px rgba(0,0,0,.35);
+}
+
+.success-card{
+background:#16a34a;
+}
+
+.good-card{
+background:#2563eb;
+}
+
+.average-card{
+background:#d97706;
+}
+
+.bad-card{
+background:#dc2626;
+}
+
+.about-card{
+background:#1e293b;
+padding:25px;
+border-radius:20px;
+}
+
+img{
+border-radius:18px;
+}
+
+</style>
+""",unsafe_allow_html=True)
+
+# -----------------------------
+# SIDEBAR
+# -----------------------------
 st.sidebar.title("📚 Navigation")
 
-page = st.sidebar.radio(
-    "Go to",
-    [
-        "🏠 Home",
-        "🎯 Prediction",
-        "📊 Dataset",
-        "📈 Visualizations",
-        "ℹ️ About"
-    ]
+page=st.sidebar.radio(
+"Go To",
+[
+"🏠 Home",
+"🎯 Prediction",
+"📊 Dataset",
+"📈 Visualizations",
+"👨‍💻 About"
+]
 )
-
-# -------------------------------
-# Home Page
-# -------------------------------
+# =========================
+# HOME PAGE
+# =========================
 if page == "🏠 Home":
 
-    # Load dataset
     df = pd.read_csv("data/StudentPerformanceFactors.csv")
 
-    # Hero Banner
     st.markdown("""
-    <div style="
-        background: linear-gradient(90deg, #0d1117, #161b22);
-        padding:30px;
-        border-radius:15px;
-        border:1px solid #30363d;
-        text-align:center;
-        margin-bottom:20px;
-    ">
-        <h1 style="color:#58a6ff;">
-            🎓 Student Performance Prediction
-        </h1>
-
-        <h3 style="color:white;">
-            Predict Student Exam Scores using Artificial Intelligence & Machine Learning
-        </h3>
-
-        <p style="color:#c9d1d9;font-size:18px;">
-            Built with Python • Scikit-Learn • Streamlit
+    <div class="hero">
+        <h1>🎓 Student Performance Prediction</h1>
+        <p>
+        Predict Student Exam Scores using Artificial Intelligence &
+        Machine Learning.
         </p>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown("---")
+    st.write("")
 
-    # Metrics
-    col1, col2, col3, col4 = st.columns(4)
+    c1, c2, c3, c4 = st.columns(4)
 
-    with col1:
-        st.metric("📊 Dataset Rows", df.shape[0])
+    with c1:
+        st.metric("📊 Dataset Rows", f"{df.shape[0]}")
 
-    with col2:
-        st.metric("📈 Features", df.shape[1])
+    with c2:
+        st.metric("📈 Features", f"{df.shape[1]-1}")
 
-    with col3:
+    with c3:
         st.metric("🤖 Algorithm", "Linear Regression")
 
-    with col4:
+    with c4:
         st.metric("🎯 R² Score", "0.77")
 
-    st.markdown("---")
+    st.write("")
 
-    # Project Overview
-    st.header("📌 Project Overview")
+    st.subheader("📌 Project Overview")
 
     st.write("""
-This project predicts a student's exam score using Machine Learning.
+This End-to-End Machine Learning project predicts student exam scores using
+academic, personal and environmental factors.
 
-The model analyzes academic and personal factors to estimate a student's expected exam score.
+The project includes:
 
-The project demonstrates the complete Machine Learning workflow:
-
-- Data Collection
 - Data Preprocessing
-- Exploratory Data Analysis (EDA)
+- Exploratory Data Analysis
 - Machine Learning Pipeline
 - Model Training
-- Model Evaluation
-- Streamlit Web Application
-- Deployment
+- Prediction Dashboard
+- Interactive Visualizations
+- Streamlit Deployment
 """)
 
-    st.markdown("---")
+    st.write("")
 
-    # Technologies
-    st.header("🛠 Technologies Used")
+    st.subheader("🛠 Technologies")
 
-    tech1, tech2, tech3 = st.columns(3)
+    a, b, c = st.columns(3)
 
-    with tech1:
+    with a:
         st.success("🐍 Python")
         st.success("🐼 Pandas")
-        st.success("🔢 NumPy")
+        st.success("📊 NumPy")
 
-    with tech2:
-        st.success("📊 Matplotlib")
-        st.success("🎨 Seaborn")
+    with b:
         st.success("🤖 Scikit-Learn")
+        st.success("📈 Matplotlib")
+        st.success("🎨 Seaborn")
 
-    with tech3:
+    with c:
         st.success("🌐 Streamlit")
         st.success("💾 Joblib")
-        st.success("📁 Git & GitHub")
-
-    st.markdown("---")
+        st.success("🔧 Git & GitHub")
 
     st.info(
-        "💡 This project was built as part of my Machine Learning & Data Science portfolio."
+        "Built as an End-to-End Machine Learning Portfolio Project."
     )
 
-# -------------------------------
-# Prediction Page
-# -------------------------------
+# =========================
+# PREDICTION PAGE
+# =========================
 elif page == "🎯 Prediction":
-
-    
 
     st.title("🎯 Student Performance Prediction")
 
-    st.markdown(
-        "Fill in the student's information below and click **Predict Exam Score**."
-    )
-
-    # Load trained pipeline
-    model = joblib.load("models/student_model.pkl")
+    st.write("Fill in the student details below.")
 
     col1, col2 = st.columns(2)
 
     with col1:
 
-        hours = st.number_input(
-            "Hours Studied",
-            min_value=0,
-            max_value=24,
-            value=5
-        )
+        hours = st.slider("Hours Studied",0,40,10)
 
-        attendance = st.number_input(
-            "Attendance (%)",
-            min_value=0,
-            max_value=100,
-            value=80
-        )
+        attendance = st.slider("Attendance (%)",0,100,80)
 
-        previous = st.number_input(
-            "Previous Scores",
-            min_value=0,
-            max_value=100,
-            value=70
-        )
+        sleep = st.slider("Sleep Hours",4,10,7)
 
-        sleep = st.number_input(
-            "Sleep Hours",
-            min_value=0,
-            max_value=12,
-            value=7
-        )
+        previous = st.slider("Previous Scores",0,100,70)
 
-        tutoring = st.number_input(
-            "Tutoring Sessions",
-            min_value=0,
-            max_value=20,
-            value=2
-        )
-
-        physical = st.number_input(
-            "Physical Activity (hrs/week)",
-            min_value=0,
-            max_value=20,
-            value=5
-        )
-
-        gender = st.selectbox(
-            "Gender",
-            ["Male", "Female"]
-        )
-
-        school = st.selectbox(
-            "School Type",
-            ["Public", "Private"]
+        motivation = st.selectbox(
+            "Motivation Level",
+            ["Low","Medium","High"]
         )
 
         internet = st.selectbox(
             "Internet Access",
-            ["Yes", "No"]
+            ["Yes","No"]
+        )
+
+        tutoring = st.slider(
+            "Tutoring Sessions",
+            0,
+            10,
+            2
+        )
+
+        physical = st.slider(
+            "Physical Activity",
+            0,
+            7,
+            3
+        )
+
+        learning = st.selectbox(
+            "Learning Disabilities",
+            ["No","Yes"]
+        )
+
+        parental = st.selectbox(
+            "Parental Education",
+            ["High School","College","Postgraduate"]
         )
 
     with col2:
 
-        parental = st.selectbox(
+        parental_inv = st.selectbox(
             "Parental Involvement",
-            ["Low", "Medium", "High"]
+            ["Low","Medium","High"]
         )
 
-        resources = st.selectbox(
+        access = st.selectbox(
             "Access to Resources",
-            ["Low", "Medium", "High"]
+            ["Low","Medium","High"]
         )
 
-        extra = st.selectbox(
+        extracurricular = st.selectbox(
             "Extracurricular Activities",
-            ["Yes", "No"]
+            ["Yes","No"]
         )
 
-        motivation = st.selectbox(
-            "Motivation Level",
-            ["Low", "Medium", "High"]
-        )
-
-        income = st.selectbox(
+        family_income = st.selectbox(
             "Family Income",
-            ["Low", "Medium", "High"]
+            ["Low","Medium","High"]
         )
 
         teacher = st.selectbox(
             "Teacher Quality",
-            ["Low", "Medium", "High"]
+            ["Low","Medium","High"]
         )
 
-        peer = st.selectbox(
+        school = st.selectbox(
+            "School Type",
+            ["Public","Private"]
+        )
+
+        peers = st.selectbox(
             "Peer Influence",
-            ["Positive", "Neutral", "Negative"]
-        )
-
-        disability = st.selectbox(
-            "Learning Disabilities",
-            ["Yes", "No"]
-        )
-
-        education = st.selectbox(
-            "Parental Education Level",
-            ["High School", "College", "Postgraduate"]
+            ["Positive","Neutral","Negative"]
         )
 
         distance = st.selectbox(
             "Distance from Home",
-            ["Near", "Moderate", "Far"]
+            ["Near","Moderate","Far"]
         )
 
-    st.markdown("---")
+        gender = st.selectbox(
+            "Gender",
+            ["Male","Female"]
+        )
+
+    st.write("")
 
     if st.button("🎯 Predict Exam Score", use_container_width=True):
 
-        input_data = pd.DataFrame({
+        input_df = pd.DataFrame({
 
             "Hours_Studied":[hours],
+
             "Attendance":[attendance],
-            "Parental_Involvement":[parental],
-            "Access_to_Resources":[resources],
-            "Extracurricular_Activities":[extra],
+
+            "Parental_Involvement":[parental_inv],
+
+            "Access_to_Resources":[access],
+
+            "Extracurricular_Activities":[extracurricular],
+
             "Sleep_Hours":[sleep],
+
             "Previous_Scores":[previous],
+
             "Motivation_Level":[motivation],
+
             "Internet_Access":[internet],
+
             "Tutoring_Sessions":[tutoring],
-            "Family_Income":[income],
+
+            "Family_Income":[family_income],
+
             "Teacher_Quality":[teacher],
+
             "School_Type":[school],
-            "Peer_Influence":[peer],
+
+            "Peer_Influence":[peers],
+
             "Physical_Activity":[physical],
-            "Learning_Disabilities":[disability],
-            "Parental_Education_Level":[education],
+
+            "Learning_Disabilities":[learning],
+
+            "Parental_Education_Level":[parental],
+
             "Distance_from_Home":[distance],
+
             "Gender":[gender]
 
         })
 
-        prediction = model.predict(input_data)
+        prediction = model.predict(input_df)[0]
 
-        st.success(
-            f"🎓 Predicted Exam Score : {prediction[0]:.2f}"
-        )
+        score = max(0, min(100, float(prediction)))
 
         st.balloons()
-    
 
-# -------------------------------
-# Dataset Page
-# -------------------------------
+        if score >= 90:
+
+            color = "#16a34a"
+            level = "🏆 Excellent Performance"
+
+        elif score >= 75:
+
+            color = "#22c55e"
+            level = "😊 Very Good Performance"
+
+        elif score >= 60:
+
+            color = "#f59e0b"
+            level = "🙂 Average Performance"
+
+        else:
+
+            color = "#ef4444"
+            level = "⚠ Needs Improvement"
+
+        st.markdown(
+            f"""
+<div style="background:{color};
+padding:25px;
+border-radius:18px;
+text-align:center;
+color:white;
+margin-top:15px;">
+
+<h2>Predicted Exam Score</h2>
+
+<h1>{score:.2f}/100</h1>
+
+<h3>{level}</h3>
+
+</div>
+""",
+            unsafe_allow_html=True
+        )
+
+        st.progress(int(score))
+# ==========================
+# DATASET PAGE
+# ==========================
 elif page == "📊 Dataset":
 
-    
+    st.markdown("<h1>📊 Student Dataset</h1>", unsafe_allow_html=True)
 
-    st.title("📊 Student Dataset")
-
-    st.markdown("Explore the dataset used to train the Machine Learning model.")
-
-    st.markdown("---")
-
-    # Load dataset
     df = pd.read_csv("data/StudentPerformanceFactors.csv")
 
-    # ==========================
-    # Dataset Metrics
-    # ==========================
+    c1, c2, c3 = st.columns(3)
 
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric("📄 Rows", df.shape[0])
-
-    with col2:
-        st.metric("📑 Columns", df.shape[1])
-
-    with col3:
-        st.metric("❓ Missing Values", int(df.isnull().sum().sum()))
+    c1.metric("Rows", len(df))
+    c2.metric("Columns", len(df.columns))
+    c3.metric("Missing Values", int(df.isnull().sum().sum()))
 
     st.markdown("---")
 
-    # ==========================
-    # Dataset Preview
-    # ==========================
-
-    st.subheader("👀 Dataset Preview")
-
-    rows = st.slider(
-        "Select number of rows",
-        min_value=5,
-        max_value=50,
-        value=10
-    )
-
-    st.dataframe(df.head(rows), use_container_width=True)
+    st.subheader("Dataset Preview")
+    st.dataframe(df, use_container_width=True)
 
     st.markdown("---")
 
-    # ==========================
-    # Dataset Information
-    # ==========================
+    st.subheader("Statistical Summary")
+    st.dataframe(df.describe(), use_container_width=True)
 
-    st.subheader("📋 Dataset Information")
+    st.markdown("---")
 
-    info_df = pd.DataFrame({
-        "Column Name": df.columns,
+    st.subheader("Data Types")
+
+    info = pd.DataFrame({
+        "Column": df.columns,
         "Data Type": df.dtypes.astype(str)
     })
 
-    st.dataframe(info_df, use_container_width=True)
+    st.dataframe(info, use_container_width=True)
 
-    st.markdown("---")
 
-    # ==========================
-    # Missing Values
-    # ==========================
-
-    st.subheader("❓ Missing Values")
-
-    missing = pd.DataFrame({
-        "Column": df.columns,
-        "Missing Values": df.isnull().sum().values
-    })
-
-    st.dataframe(missing, use_container_width=True)
-
-    st.markdown("---")
-
-    # ==========================
-    # Statistical Summary
-    # ==========================
-
-    st.subheader("📊 Statistical Summary")
-
-    st.dataframe(df.describe(), use_container_width=True)
-
-# -------------------------------
-# Visualizations
-# -------------------------------
+# ==========================
+# VISUALIZATIONS PAGE
+# ==========================
 elif page == "📈 Visualizations":
 
-    st.title("📈 Exploratory Data Analysis")
+    st.markdown("<h1>📈 Exploratory Data Analysis</h1>", unsafe_allow_html=True)
 
-    st.markdown(
-        "These visualizations were generated during the Exploratory Data Analysis (EDA) phase."
-    )
-
-    st.markdown("---")
+    st.info("Visualizations created during Exploratory Data Analysis.")
 
     col1, col2 = st.columns(2)
 
     with col1:
 
-        st.subheader("📊 Exam Score Distribution")
-        st.image(
-            "images/exam_score_distribution.png",
-            use_container_width=True
-        )
+      st.image(
+        "images/exam_score_distribution.png",
+        caption="Exam Score Distribution",
+        use_container_width=True
+    )
 
-        st.caption(
-            "Shows how exam scores are distributed among students."
-        )
+      st.image(
+        "images/hours_vs_score.png",
+        caption="Hours Studied vs Exam Score",
+        use_container_width=True
+    )
 
-        st.markdown("---")
+      st.image(
+        "images/sleep_hours.png",
+        caption="Sleep Hours vs Exam Score",
+        use_container_width=True
+    )
 
-        st.subheader("📚 Hours Studied vs Exam Score")
-        st.image(
-            "images/hours_vs_score.png",
-            use_container_width=True
-        )
-
-        st.caption(
-            "Students studying more hours generally achieve higher scores."
-        )
-
-        st.markdown("---")
-
-        st.subheader("😴 Sleep Hours vs Exam Score")
-        st.image(
-            "images/sleep_hours.png",
-            use_container_width=True
-        )
-
-        st.caption(
-            "Relationship between sleep duration and academic performance."
-        )
-
-        st.markdown("---")
-
-        st.subheader("👨👩 Gender vs Exam Score")
-        st.image(
-            "images/gender_score.png",
-            use_container_width=True
-        )
-
-        st.caption(
-            "Comparison of exam scores across genders."
-        )
+      st.image(
+        "images/gender_score.png",
+        caption="Gender vs Exam Score",
+        use_container_width=True
+    )
 
     with col2:
 
-        st.subheader("🔥 Correlation Heatmap")
-        st.image(
-            "images/correlation_heatmap.png",
-            use_container_width=True
-        )
+      st.image(
+        "images/correlation_heatmap.png",
+        caption="Correlation Heatmap",
+        use_container_width=True
+    )
 
-        st.caption(
-            "Correlation between all numerical features."
-        )
+      st.image(
+        "images/attendance_vs_score.png",
+        caption="Attendance vs Exam Score",
+        use_container_width=True
+    )
 
-        st.markdown("---")
+      st.image(
+        "images/previous_scores.png",
+        caption="Previous Scores vs Exam Score",
+        use_container_width=True
+    )
+# ==========================
+# ABOUT PAGE
+# ==========================
+elif page == "👨‍💻 About":
+    st.markdown("<h1>👨‍💻 About the Developer</h1>", unsafe_allow_html=True)
 
-        st.subheader("🏫 Attendance vs Exam Score")
-        st.image(
-            "images/attendance_vs_score.png",
-            use_container_width=True
-        )
+    left, right = st.columns([1, 2])
 
-        st.caption(
-            "Higher attendance is generally associated with better scores."
-        )
+    with left:
+        st.image("images/profile.jpg", use_container_width=True)
 
-        st.markdown("---")
-
-        st.subheader("📝 Previous Scores vs Exam Score")
-        st.image(
-            "images/previous_scores.png",
-            use_container_width=True
-        )
-
-        st.caption(
-            "Students with stronger previous performance often score higher."
-        )
-
-    st.markdown("---")
-
-    st.success("✅ All visualizations were created using Matplotlib and Seaborn.")
-
-# -------------------------------
-# About
-# -------------------------------
-elif page == "ℹ️ About":
-
-    st.title("👨‍💻 About the Developer")
+    with right:
+        st.markdown("## **Jivesh Mishra**")
+        st.write("🎓 MSc Artificial Intelligence Student")
+        st.write("💻 Python Developer")
+        st.write("🤖 Machine Learning Enthusiast")
+        st.write("📊 Data Science Learner")
+        st.write("🌐 Streamlit Developer")
+        st.write("🚀 Passionate about building AI-powered web applications.")
 
     st.markdown("---")
 
-    col1, col2 = st.columns([1,2])
+    st.subheader("Technical Skills")
 
-    with col1:
+    a, b, c = st.columns(3)
 
-        st.image(
-            "https://avatars.githubusercontent.com/u/9919?s=280&v=4",
-            width=180
-        )
-
-    with col2:
-
-        st.header("Jivesh Mishra")
-
-        st.write("🎓 BCA Graduate")
-
-        st.write("🤖 Currently pursuing M.Sc. in Artificial Intelligence")
-
-        st.write("💡 Passionate about AI, Machine Learning and Data Science")
-
-        st.write("🚀 Building real-world AI projects to strengthen my portfolio")
-
-    st.markdown("---")
-
-    st.header("💻 Technical Skills")
-
-    skill1, skill2, skill3 = st.columns(3)
-
-    with skill1:
+    with a:
         st.success("Python")
         st.success("Pandas")
         st.success("NumPy")
-        st.success("SQL")
 
-    with skill2:
-        st.success("Machine Learning")
-        st.success("Data Science")
+    with b:
         st.success("Scikit-Learn")
-        st.success("EDA")
+        st.success("Machine Learning")
+        st.success("Data Analysis")
 
-    with skill3:
+    with c:
+        st.success("Streamlit")
         st.success("Git")
         st.success("GitHub")
-        st.success("Streamlit")
-        st.success("Data Visualization")
 
     st.markdown("---")
 
-    st.header("🎯 Career Objective")
+    st.subheader("Career Objective")
 
     st.info("""
-I am passionate about solving real-world problems using Artificial Intelligence,
-Machine Learning and Data Science.
-
-My goal is to become an AI/ML Engineer by building impactful projects,
-continuously learning new technologies, and applying them to practical solutions.
+To become an AI & Machine Learning Engineer by building practical,
+real-world projects that solve meaningful problems while continuously
+learning modern AI technologies.
 """)
 
     st.markdown("---")
 
-    st.header("🔗 Connect with Me")
+    st.subheader("Connect with Me")
 
-    st.markdown(
-        """
+    st.markdown("""
 **GitHub**
 
-https://github.com/jiveshmishra
+https://github.com/jiveshai-07
 
 **LinkedIn**
 
-https://www.linkedin.com/in/jivesh-mishra-01433331b
-"""
-    )
-
-    st.markdown("---")
+https://linkedin.com/in/jivesh-mishra
+""")
 
     st.success("⭐ Thank you for visiting my project!")
