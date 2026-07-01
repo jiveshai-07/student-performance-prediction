@@ -540,8 +540,8 @@ elif page == "👨‍💻 About":
     </style>
     <div class="circular-img">
 """, unsafe_allow_html=True)
-st.image("images/profile.jpg", width=200)
-st.markdown("</div>", unsafe_allow_html=True)
+        st.image("images/profile.jpg", width=200)
+        st.markdown("</div>", unsafe_allow_html=True)
 
     with right:
         st.markdown("## **Jivesh Mishra**")
