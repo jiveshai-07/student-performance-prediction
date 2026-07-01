@@ -15,7 +15,22 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
+st.markdown("""
+    <style>
+    [data-testid="stSidebar"] {
+        min-width: 250px !important;
+        max-width: 250px !important;
+        display: block !important;
+        visibility: visible !important;
+    }
+    [data-testid="collapsedControl"] {
+        display: none !important;
+    }
+    section[data-testid="stSidebar"] > div {
+        padding-top: 1rem;
+    }
+    </style>
+""", unsafe_allow_html=True)
 # -----------------------------
 # LOAD MODEL & DATA
 # -----------------------------
