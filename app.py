@@ -15,22 +15,7 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-st.markdown("""
-    <style>
-    [data-testid="stSidebar"] {
-        min-width: 250px !important;
-        max-width: 250px !important;
-        display: block !important;
-        visibility: visible !important;
-    }
-    [data-testid="collapsedControl"] {
-        display: none !important;
-    }
-    section[data-testid="stSidebar"] > div {
-        padding-top: 1rem;
-    }
-    </style>
-""", unsafe_allow_html=True)
+
 # -----------------------------
 # LOAD MODEL & DATA
 # -----------------------------
@@ -159,17 +144,17 @@ border-radius:18px;
 # -----------------------------
 # SIDEBAR
 # -----------------------------
-st.sidebar.title("📚 Navigation")
+from streamlit_option_menu import option_menu
 
-page=st.sidebar.radio(
-"Go To",
-[
-"🏠 Home",
-"🎯 Prediction",
-"📊 Dataset",
-"📈 Visualizations",
-"👨‍💻 About"
-]
+page = option_menu(
+    menu_title=None,
+    options=["🏠 Home", "🎯 Prediction", "📊 Dataset", "📈 Visualizations", "👨‍💻 About"],
+    icons=["house", "bullseye", "table", "bar-chart", "person"],
+    orientation="horizontal",
+    styles={
+        "container": {"padding": "0px"},
+        "nav-link-selected": {"background-color": "#1f77b4"},
+    }
 )
 # =========================
 # HOME PAGE
